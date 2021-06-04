@@ -1,6 +1,3 @@
-# Label-Wise Pre-Training (LW-PT)
-This is the code for NLPCC 2020 paper [Label-Wised Document Pre-Training for Multi-Label Text Classification](https://arxiv.org/abs/2008.06695)
-
 ## Requirements
 
 - Ubuntu 16.04
@@ -19,10 +16,6 @@ We provide the proprecessed RMSC and AAPD datasets and pretrained checkpoints of
     	|--label_test
     	|--label_train
     	...
-    |--rmsc
-    	|--rmsc.data.test.json
-    	|--rmsc.data.train.json
-    	|--rmsc.data.valid.json
     aapd_word2vec.model
     aapd_word2vec.model.wv.vectors.npy
     aapd.meta.json
@@ -33,7 +26,6 @@ We provide the proprecessed RMSC and AAPD datasets and pretrained checkpoints of
     rmsc.pkl
 --outputs
     |--aapd
-    |--rmsc
 ```
 
 > Note that the `data/aapd`and `data/rmsc` is the initial dataset. Here we provide a split of RMSC (i.e. RMSC-V2).
@@ -41,17 +33,11 @@ We provide the proprecessed RMSC and AAPD datasets and pretrained checkpoints of
 - Testing on AAPD
 ``` bash
 python classification.py -config=aapd.yaml -in=aapd -gpuid [GPU_ID] -test
-```
-
-- Testing on RMSC
-``` bash
-python classification.py -config=rmsc.yaml -in=rmsc -gpuid [GPU_ID] -test
-```
 
 ## Preprocessing
 If you want to preprocess the dataset by yourself,  just run the following command with name of dataset (e.g. RMSC or AAPD).
 ``` bash
-PYTHONHASHSEED=1 python preprocess.py -data=[RMSC/AAPD]
+PYTHONHASHSEED=1 python preprocess.py -data=AAPD
 ```
 > Note that `PYTHONHASHSEED` is used in word2vec.
 
@@ -60,10 +46,10 @@ PYTHONHASHSEED=1 python preprocess.py -data=[RMSC/AAPD]
 Pre-train the LW-PT model.
 
 ``` bash
-python pretrain.py -config=[CONFIG_NAME] -out=[OUT_INFIX] -gpuid [GPU_ID] -train -test
+python pretrain.py -config=aapd.yaml -gpuid=[GPU_ID] -train -test
 ```
 
-- `CONFIG_NAME`: `aapd.yaml` or `rmsc.yaml`
+- `CONFIG_NAME`: `aapd.yaml` 
 - `OUT_INFIX`: infix of outputs directory contains logs and checkpoints
 
 ## MLTC Task
@@ -72,32 +58,15 @@ Train the downstream model for MLTC task.
 
 ``` bash
 python classification.py -config=[CONFIG_NAME] -in=[IN_INFIX] -out=[OUT_INFIX] -gpuid [GPU_ID] -train -test
+python classification.py -config=aapd.yaml -in=default -out=tuned -gpuid=0 -train -test
 ```
 
 - `IN_INFIX`: infix of inputs directory contains pre-trained checkpoints
 
-## Others
+## Test Text
 
-- build a static documents representation to facilitate downstream tasks
 ``` bash
-python build_doc_rep.py -config=[CONFIG_NAME] -in=[IN_INFIX] -gpuid [GPU_ID]
+python test_text.py -text=[TEXT] -config=aapd.yaml -in=default -out=tuned -gpuid=2
 ```
-> Not used unless necessary.
 
-- make RMSC-V2 dataset: `tests/make_rmsc.py`
-- visual document embeddings: `tests/visual_emb.py`
-- visual labels F1 score: `tests/visual_label_f1.py`
-- case study: `tests/case_study.py`
 
-## Reference
-
-If you consider our work useful, please cite the paper:
-
-```
-@inproceedings{liu2020label,
-	title="Label-Wise Document Pre-Training for Multi-Label Text Classification",
-	author="Han Liu, Caixia Yuan and Xiaojie Wang",
-	booktitle="CCF International Conference on Natural Language Processing and Chinese Computing",
-	year="2020"
-}
-```
