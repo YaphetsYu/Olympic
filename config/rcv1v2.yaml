@@ -1,0 +1,54 @@
+# config file
+
+dataset:
+  h5_path: data/rcv1v2.h5
+#  data_path: data/rcv1v2_hier.pkl
+  data_path: data/rcv1v2.pkl
+  meta_data_path: data/rcv1v2.meta.json
+  doc_rep_path: data/rcv1v2_pt_rep.pt
+
+global:
+  random_seed: 123
+  num_data_workers: 16
+
+  max_sent_length: 50
+  max_sent_num: 15
+  max_doc_length: 500
+  cand_doc_size: 3
+
+model:
+  name: LWPT    # CNN, RNN, LWAN, LWPT
+  decoder: MLP  # Linear, MLP, LW, LG, LWLG
+  hierarchical: False  # same as dataset
+  fine_tune: False
+
+  use_pretrain: False
+  embedding_num: 50010
+  embedding_dim: 256
+  embedding_path: None
+  embedding_freeze: True
+
+  cell: LSTM
+  num_layers: 2
+  hidden_size: 256
+  label_size: 103    # different with dataset
+  dropout_p: 0.2
+  layer_norm: true
+
+train:
+  num_epochs: 20
+  train_iters: 5000
+  valid_iters: 50
+  test_iters: 1000
+
+  eval_steps: 100    # TODO: valid dataloader locked
+  save_steps: 1000
+
+  batch_size: 128
+  optimizer: adam   # adam, sgd, adamax
+  learning_rate: 0.001
+  clip_grad_norm: 10
+
+  learning_rate_decay: 0.9
+  start_decay_at: 2
+  decay_steps: 1000
